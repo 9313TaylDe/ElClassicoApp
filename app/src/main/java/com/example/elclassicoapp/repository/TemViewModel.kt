@@ -2,8 +2,6 @@ package com.example.elclassicoapp.repository
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.elclassicoapp.data.Competitions
-import com.example.elclassicoapp.data.DAOCompetitions
 import com.example.elclassicoapp.data.DAOTeams
 import com.example.elclassicoapp.data.TeamsEntity
 import kotlinx.coroutines.flow.SharingStarted

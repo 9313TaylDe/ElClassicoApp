@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign.Companion.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,46 +37,72 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.elclassicoapp.data.Actions
-import com.example.elclassicoapp.data.Competitions
+import com.example.elclassicoapp.data.CompetitionsEntity
 import com.example.elclassicoapp.data.DAOCompetitions
+import com.example.elclassicoapp.data.DAOPlayer
 import com.example.elclassicoapp.data.DAOTeams
+import com.example.elclassicoapp.data.PlayerEntity
+import com.example.elclassicoapp.data.PlayerViewModel
+import com.example.elclassicoapp.data.Statistics
 import com.example.elclassicoapp.data.TeamsEntity
 import com.example.elclassicoapp.repository.CompetitionFactory
 import com.example.elclassicoapp.repository.CompetitionViewModel
+import com.example.elclassicoapp.repository.SecurityFactoryPlaye
 import com.example.elclassicoapp.repository.SecurityFactoryTeams
 import com.example.elclassicoapp.repository.TeamViewModel
+import com.example.elclassicoapp.ui.colors.GrayBlue
 import com.example.elclassicoapp.ui.colors.borderCardsMini
 import com.example.elclassicoapp.ui.colors.fundoPai
 import com.example.elclassicoapp.ui.colors.fundocardpill
 import com.example.elclassicoapp.ui.colors.verdetext
 import com.example.elclassicoapp.ui.components.PostingCard
+import com.example.elclassicoapp.ui.components.StattisticsCard
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun HomeScreen(
 	teamViewModel: TeamViewModel,
 	competitionViewModel: CompetitionViewModel,
+	playerViewModel: PlayerViewModel,
 	add: () -> Unit,
 	viewClassification: () -> Unit,
 	randomTeams: () -> Unit,
 ) {
 	
 	val action = listOf(
-		Actions.new_camp,
-		Actions.teams,
-		Actions.matches,
-		Actions.ranking,
+		Actions.NEW_CAMP,
+		Actions.TEAMS,
+		Actions.MATCHES,
+		Actions.RANKING,
 	)
 	val recentschampionship = listOf(
-		Actions.Brasileriao,
-		Actions.ChampionsLeague,
+		Actions.BRASILEIRAO,
+		Actions.CHAMPIONSLEAGUE,
 		Actions.CopaDoMundo,
 		Actions.CopaNacional,
 	)
+	
+	val navigateBottom = listOf(
+		Actions.HOME,
+		Actions.Campeonatos,
+		Actions.MatchesHome,
+		Actions.Estatisticas,
+		Actions.Configuracoes
+	)
+	val statistics = listOf(
+		Statistics.ConcluedMatches,
+		Statistics.TotalGoals,
+		Statistics.TopScorer,
+	)
+	
 	val modi = Modifier
 	val qtd by teamViewModel.quantidadeTimes.collectAsStateWithLifecycle()
-	val competition by competitionViewModel.quantidaderodadas.collectAsStateWithLifecycle()
-	val championship: Competitions
+	val rounds by competitionViewModel.quantidaderodadas.collectAsStateWithLifecycle()
+	val roundsTotal by competitionViewModel.totaltodadas.collectAsStateWithLifecycle()
+	val goals by competitionViewModel.totalGoals.collectAsStateWithLifecycle()
+	val poacher by playerViewModel.getPlayer().collectAsStateWithLifecycle() //ATUALIZAÇÃO 2.0
+	val championship: CompetitionsEntity
 	Scaffold(
 		containerColor = fundoPai,
 		topBar = {
@@ -90,6 +117,16 @@ fun HomeScreen(
 					imageVector = Icons.Default.PersonPin, tint = Color.White, contentDescription = ""
 				)
 			}
+		},
+		bottomBar = {
+			navigateBottom.forEach { itemnav ->
+				Row() {
+					Column() {
+					
+					}
+				}
+			}
+			
 		},
 		modifier = Modifier
 			.fillMaxSize()
@@ -114,13 +151,18 @@ fun HomeScreen(
 			
 			)
 			PostingCard(
-				oncontinue = {}, onAdd = {}, onRandom = {}, onClassifier = {}, competitions = Competitions(
+				oncontinue = {},
+				onAdd = {},
+				onRandom = {},
+				onClassifier = {},
+				competitions = CompetitionsEntity(
 					times = 10,
 					matches = 10,
 					rounds = 2,
 					totalRounds = 20,
 					name = "",
-					isFinished = false
+					isFinished = false,
+					totalGoals = 10
 				)
 			)
 			Spacer(modi.height(30.dp))
@@ -152,7 +194,20 @@ fun HomeScreen(
 								Icon(
 									imageVector = acts.icon,
 									contentDescription = "",
+									modifier = Modifier.size(30.dp),
 									tint = acts.color
+								)
+								Spacer(
+									Modifier.height(
+										6.dp
+									)
+								)
+								Text(
+									text = acts.text,
+									color = Color.White,
+									fontSize = 10.sp,
+									textAlign = Center,
+									modifier = Modifier.height(22.dp)
 								)
 							}
 							
@@ -163,6 +218,9 @@ fun HomeScreen(
 									tint = acts.color,
 									
 									)
+								Text(
+									text = acts.text
+								)
 							}
 						}
 					}
@@ -214,26 +272,21 @@ fun HomeScreen(
 								Icon(
 									painter = painterResource(recents.iconRes),
 									contentDescription = "",
-									tint = Color.White,
+									tint = recents.color,
 									modifier = Modifier.size(40.dp)
 								
 								)
 								Text(
-									text = qtd.toString(),
-									color = Color.White,
-									fontSize = 10.sp, textAlign = Center
-								)
-								Text(
-									text = competition.toString(),
-									color = Color.White,
-									fontSize = 10.sp, textAlign = Center
-								)
-								Text(
 									text = recents.text,
 									color = Color.White,
+									fontWeight = FontWeight.Bold,
 									fontSize = 10.sp, textAlign = Center
 								)
-								
+								Text(
+									text = "$qtd Times\n$rounds/$roundsTotal Rodadas",
+									color = GrayBlue,
+									fontSize = 10.sp, textAlign = Center
+								)
 							}
 						}
 						Box(
@@ -255,6 +308,30 @@ fun HomeScreen(
 					}
 				}
 			}
+			Row(
+				modifier = Modifier.fillMaxWidth(),
+				horizontalArrangement = Arrangement.Absolute.SpaceBetween
+			) {
+				statistics.forEach { statss ->
+					val value: String = when (statss) {
+						Statistics.ConcluedMatches -> roundsTotal.toString()
+						Statistics.TotalGoals -> goals.toString()
+						Statistics.TopScorer -> poacher?.name ?: "Nenhum"
+						else -> ""
+					}
+					
+					val subtitle = when(statss){
+						Statistics.ConcluedMatches -> "Jogos realizados"
+						Statistics.TotalGoals -> "Gols marcados"
+						Statistics.TopScorer -> "${poacher?.goals ?: 0} gol"
+					}
+					StattisticsCard(
+						statss,
+						value = value,
+						subtitle = subtitle
+					)
+				}
+			}
 		}
 		
 	}
@@ -269,15 +346,15 @@ fun prev() {
 		override suspend fun atualizar(team: TeamsEntity) {}
 		override suspend fun deletar(team: TeamsEntity) {}
 		override fun pegarTodos() =
-			kotlinx.coroutines.flow.flowOf(emptyList<TeamsEntity>())
+			flowOf(emptyList<TeamsEntity>())
 	}
 	
 	val fakeCompetitionDao = object : DAOCompetitions {
-		override suspend fun Inserir(competitions: Competitions) {}
-		override suspend fun Deletar(competitions: Competitions) {}
-		override suspend fun Atualizar(competitions: Competitions) {}
+		override suspend fun Inserir(competitions: CompetitionsEntity) {}
+		override suspend fun Deletar(competitions: CompetitionsEntity) {}
+		override suspend fun Atualizar(competitions: CompetitionsEntity) {}
 		override fun pegarTodos() =
-			flowOf(emptyList<Competitions>())
+			flowOf(emptyList<CompetitionsEntity>())
 	}
 	val competitionVm: CompetitionViewModel = viewModel(
 		factory = CompetitionFactory(fakeCompetitionDao)
@@ -287,11 +364,29 @@ fun prev() {
 		factory = SecurityFactoryTeams(fakeDao)
 	)
 	
+	val fake = object : DAOPlayer {
+		override fun getTopScorer(): Flow<PlayerEntity> =
+			flowOf(
+				PlayerEntity(
+					id = 1,
+					name = "Messi",
+					teamId = 1,
+					goals = 10
+				)
+			)
+		
+	}
+	
+	val fakeviewprf: PlayerViewModel = viewModel(
+		factory = SecurityFactoryPlaye(fake)
+	)
+	
 	HomeScreen(
 		teamViewModel = vmfake,
 		add = {},
 		randomTeams = {},
 		viewClassification = {},
-		competitionViewModel = competitionVm
+		competitionViewModel = competitionVm,
+		playerViewModel = fakeviewprf
 	)
 }

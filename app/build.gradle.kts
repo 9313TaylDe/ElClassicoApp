@@ -1,4 +1,3 @@
-
 plugins {
 	id("com.android.application")
 	id("org.jetbrains.kotlin.android")
@@ -44,7 +43,9 @@ android {
 	}
 }
 dependencies {
+	implementation("com.composables:icons-lucide:1.1.0")
 	
+	implementation("br.com.devsrsouza.compose.icons:font-awesome:1.1.1")
 	implementation(platform("androidx.compose:compose-bom:2024.06.00"))
 	
 	implementation("androidx.core:core-ktx:1.13.1")

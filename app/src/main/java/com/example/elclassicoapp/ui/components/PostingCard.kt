@@ -37,8 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.elclassicoapp.R
-import com.example.elclassicoapp.data.Actions
-import com.example.elclassicoapp.data.Competitions
+import com.example.elclassicoapp.data.CompetitionsEntity
 import com.example.elclassicoapp.ui.colors.buttoncolor
 import com.example.elclassicoapp.ui.colors.fundoPai
 import com.example.elclassicoapp.ui.colors.verdetext
@@ -48,7 +47,7 @@ fun PostingCard(
 	onAdd: () -> Unit,
 	onRandom: () -> Unit,
 	oncontinue: () -> Unit,
-	onClassifier: () -> Unit, competitions: Competitions
+	onClassifier: () -> Unit, competitions: CompetitionsEntity
 ) {
 	
 	val tipo = "times"
@@ -184,13 +183,14 @@ fun prevs() {
 	PostingCard(
 		onAdd = {},
 		onClassifier = {},
-		competitions = Competitions(
+		competitions = CompetitionsEntity(
 			times = 15,
 			matches = 30,
 			rounds = 15,
 			totalRounds = 35,
 			name = "",
-			isFinished = false
+			isFinished = false,
+			totalGoals = 0,
 		),
 		oncontinue = {},
 		onRandom = {}
